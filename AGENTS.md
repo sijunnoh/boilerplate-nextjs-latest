@@ -115,6 +115,35 @@ function DailyVisitBarChart({ data }: { data: DailyVisitData[] }) {
 - **지향**: `AdminHeader`, `UserHeader` 처럼 역할별로 명확히 분리된 컴포넌트.
 - **판단 기준**: Boolean props가 2개 이상이거나, props 이름이 "옵션"이 아닌 "권한/역할"을 나타낸다면 컴포넌트를 분리합니다.
 
+### 3.3 단일 파일 책임 원칙
+
+서로 다른 목적을 가진 함수들을 하나의 파일에 몰아넣는 것을 금지합니다.
+**하나의 파일이 하나의 논리적 도메인/책임만 갖도록 분리**하는 것을 원칙으로 합니다.
+
+- **Bad Practice**: `auth-actions.ts`라는 파일 하나에 `login`, `logout`, `verify`, `nonce` 등 모든 인증 관련 액션을 몰아넣는 것.
+- **Good Practice**: 역할별로 파일을 분리하여, 파일명만 보고도 어떤 액션인지 알 수 있게 하는 것.
+  - `generate-nonce-action.ts`
+  - `verify-signature-action.ts`
+  - `get-session-action.ts`
+  - `logout-action.ts`
+
+> **이유**: 하나의 파일에 여러 기능이 섞여 있으면, 코드의 의존성이 복잡해지고 변경 시 영향 범위를 파악하기 어렵습니다. 파일을 나누는 비용을 아끼지 마세요.
+
+### 3.4 Index 파일 생성 금지
+
+폴더의 진입점으로 `index.ts` 또는 `index.tsx`를 생성하는 행위를 금지합니다.
+모든 import는 **구체적인 파일명**을 명시해야 합니다.
+
+- **Bad Practice**: `import { UserProfile } from "@/features/user"` (암시적 index 참조)
+- **Good Practice**: `import { UserProfile } from "@/features/user/user-profile"` (명시적 파일 참조)
+
+> **이유**:
+>
+> 1. **순환 참조(Circular Dependency)**: Barrel file(index.ts)은 순환 참조의 주된 원인입니다.
+> 2. **검색 및 탐색 어려움**: 프로젝트에 `index.ts`가 수십 개 존재하면 파일명 검색(`Cmd+P`)으로 파일을 찾기 어렵습니다.
+> 3. **모호함 제거**: 현대의 IDE는 파일 간 이동이 매우 쉬우므로, 코드를 뭉쳐두는 편의성보다 **명확한 출처**를 우선시합니다.
+> 4. **성능 문제**: Index 파일을 통해 import하면, 사용하지 않는 다른 export들까지 불필요하게 로드/분석되어 빌드 성능과 런타임 초기화 속도에 악영향을 줍니다.
+
 ---
 
 ## 4. 네이밍과 컨벤션 (Naming & Conventions)
