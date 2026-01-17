@@ -65,10 +65,10 @@ React에서 컴포넌트의 일부 상태나 로직을 수정하는 대신, `key
  * 일별 방문자 수 데이터를 시각화하기 위한 막대 차트 컴포넌트
  *
  * - 외부에서 전달받은 data를 차트 표현에 적합한 형태로 가공하여
- *   BarChart 컴포넌트에 전달한다.
+ * BarChart 컴포넌트에 전달한다.
  */
 function DailyVisitBarChart({ data }: { data: DailyVisitData[] }) {
-	...
+  ...
 
   // 데이터가 변경되면, 해당 변경 사항이 동일한 차트 인스턴스에 즉시 반영되어야 한다.
   return <BarChart key={data.length} data={data} />
@@ -144,6 +144,17 @@ function DailyVisitBarChart({ data }: { data: DailyVisitData[] }) {
 > 3. **모호함 제거**: 현대의 IDE는 파일 간 이동이 매우 쉬우므로, 코드를 뭉쳐두는 편의성보다 **명확한 출처**를 우선시합니다.
 > 4. **성능 문제**: Index 파일을 통해 import하면, 사용하지 않는 다른 export들까지 불필요하게 로드/분석되어 빌드 성능과 런타임 초기화 속도에 악영향을 줍니다.
 
+### 3.5 Next.js App Router 구조 원칙
+
+`src/app` 디렉토리 내의 파일은 기본적으로 **Server Component**를 유지해야 합니다.
+
+- **Server Component 유지**: `src/app` 내의 `page.tsx`, `layout.tsx` 등은 데이터 페칭과 메타데이터 생성을 담당하는 Server Component여야 합니다. 이 파일들 최상단에 `'use client'`를 선언하는 행위를 **금지**합니다.
+- **Client Component 분리**: `useState`, `useEffect`, 이벤트 핸들러 등 클라이언트 로직이 필요한 부분은 반드시 **별도의 파일(Client Component)로 분리**해야 합니다.
+  - 분리된 컴포넌트는 `src/features` 또는 `src/components` 등 적절한 위치에 생성한 후, `src/app` 페이지에서 import하여 사용합니다.
+- **이유**:
+  1. **성능 최적화**: 불필요한 JS 번들 크기를 줄이고, 서버 사이드 렌더링의 이점을 극대화하기 위함입니다.
+  2. **책임 분리**: 데이터 로딩(서버)과 상호작용(클라이언트)의 책임을 명확히 분리하기 위함입니다.
+
 ---
 
 ## 4. 네이밍과 컨벤션 (Naming & Conventions)
@@ -186,8 +197,9 @@ function DailyVisitBarChart({ data }: { data: DailyVisitData[] }) {
 
 ### 5.2 공통 유틸리티 사용
 
-- **로그**: `console.log` 대신 프로젝트 내의 `logger` 클래스를 사용해야 합니다.
-- **스토리지**: `localStorage` 직접 접근 대신 `storage` 클래스를 사용해야 합니다.
+- **로그 (Logging)**: `console.log`, `console.warn`, `console.error` 등 **모든 콘솔 출력 함수**의 직접 사용을 금지합니다. 반드시 프로젝트 내의 **`logger` 클래스(또는 모듈)**를 사용해야 합니다.
+  - 이유: 로그 레벨 관리, 운영 환경에서의 노출 제어, 일관된 포맷팅을 위해서입니다.
+- **스토리지 (Storage)**: `localStorage`, `sessionStorage`에 직접 접근하는 것을 금지합니다. 반드시 프로젝트 내의 **`storage` 클래스**를 사용해야 합니다.
 
 ---
 
@@ -197,7 +209,8 @@ function DailyVisitBarChart({ data }: { data: DailyVisitData[] }) {
 2. [ ] 함수에 **목적(Contract)**을 설명하는 주석이 있는가? (단순 구현 설명이 아닌, '보장해야 할 동작' 명시)
 3. [ ] 외부 구조(API 등) 코드는 **`src` 최상단**에 그대로 두었는가?
 4. [ ] 복잡한 분기 대신 **컴포넌트 분리**를 고려했는가?
-5. [ ] 파일명은 **kebab-case**이며, 축약 없이 명확한가?
-6. [ ] 아이콘 이름은 **`Icon`**으로 끝나 아이콘임을 명확히 했는가?
-7. [ ] Tailwind에서 `size-`를 사용하여 **정사각 비율임**을 명확히 했는가?
-8. [ ] 로그와 스토리지는 전용 클래스를 사용했는가?
+5. [ ] **`src/app` 내부는 Server Component**로 유지하고, 클라이언트 로직은 별도 컴포넌트로 분리했는가? (`'use client'` 남용 금지)
+6. [ ] 파일명은 **kebab-case**이며, 축약 없이 명확한가?
+7. [ ] 아이콘 이름은 **`Icon`**으로 끝나 아이콘임을 명확히 했는가?
+8. [ ] Tailwind에서 `size-`를 사용하여 **정사각 비율임**을 명확히 했는가?
+9. [ ] 로그(`console.*`)와 스토리지는 **전용 클래스(logger, storage)**를 사용했는가?

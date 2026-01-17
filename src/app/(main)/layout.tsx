@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   description: "Sample Description",
 }
 
-const SampleLayout = ({ children }: { children: React.ReactNode }) => {
+const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>
 }
 
-export default SampleLayout
+export default MainLayout
