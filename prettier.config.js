@@ -10,7 +10,7 @@ module.exports = {
   semi: false, // 세미콜론 미사용
   singleQuote: false, // 큰따옴표 사용
   tabWidth: 2, // 들여쓰기 2칸
-  trailingComma: "es5", // ES5 호환 trailing comma
+  trailingComma: "all", // 모든 위치에 trailing comma 적용
 
   // Import 정렬 규칙
   importOrder: [
